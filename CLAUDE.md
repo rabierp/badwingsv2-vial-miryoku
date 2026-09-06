@@ -22,9 +22,20 @@ itérations petites et testées plutôt que de grosses réécritures.
   d'une main à l'autre).
 - `miryoku_vial/vial_export.py` — assemble le document `.vil` complet
   (layout + macros/tap-dance/combos vides + réglages).
-- `miryoku_vial/cli.py` — CLI (`python3 -m miryoku_vial`).
+- `miryoku_vial/cli.py` — CLI (`python3 -m miryoku_vial`). Ne fige
+  jamais l'uid en dur : `--uid` reste obligatoire pour un vrai import,
+  défaut 0.
+- `config/keyboard_uid.txt` — seul fichier destiné à être édité
+  directement sur GitHub (web UI) par l'utilisateur final : contient
+  uniquement l'uid de sa carte (décimal ou `0x...`). Lu par le
+  workflow CI, jamais par le code Python lui-même (voir invariants).
 - `tests/` — vérifient la forme de la matrice et du document généré.
   Toujours garder `pytest` vert après une modification.
+- `.github/workflows/generate-vil.yml` — régénère et recommite
+  `output/bad_wings_v2_miryoku.vil` sur push quand `miryoku_vial/**`,
+  `pyproject.toml` ou `config/keyboard_uid.txt` changent ; échoue sur
+  PR si le fichier committé est périmé. C'est le chemin "sans rien
+  installer en local" mis en avant dans le README — le préserver.
 
 ## Invariants à respecter
 
@@ -35,8 +46,10 @@ itérations petites et testées plutôt que de grosses réécritures.
   physique sur le Bad Wings V2 : elles doivent rester `-1` dans le
   `.vil` généré (voir `build_matrix`).
 - Le champ `uid` du `.vil` est spécifique au firmware compilé de
-  l'utilisateur : ne jamais le figer en dur, toujours passer par
-  `--uid` (défaut 0, avec avertissement dans le README).
+  l'utilisateur : ne jamais le figer en dur dans le code Python,
+  toujours passer par `--uid` (défaut 0, avec avertissement dans le
+  README). Sa valeur réelle vit uniquement dans
+  `config/keyboard_uid.txt`, lu par le workflow CI — pas ailleurs.
 
 ## Commandes utiles
 

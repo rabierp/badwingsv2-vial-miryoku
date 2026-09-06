@@ -5,11 +5,13 @@ on:
     paths:
       - "miryoku_vial/**"
       - "pyproject.toml"
+      - "config/keyboard_uid.txt"
       - ".github/workflows/generate-vil.yml"
   pull_request:
     paths:
       - "miryoku_vial/**"
       - "pyproject.toml"
+      - "config/keyboard_uid.txt"
       - ".github/workflows/generate-vil.yml"
   workflow_dispatch: {}
 
@@ -32,8 +34,12 @@ jobs:
       - name: Run tests
         run: python3 -m pytest -q
 
+      - name: Read target keyboard uid
+        id: uid
+        run: echo "value=$(tr -d '[:space:]' < config/keyboard_uid.txt)" >> "$GITHUB_OUTPUT"
+
       - name: Regenerate output/bad_wings_v2_miryoku.vil
-        run: python3 -m miryoku_vial -o output/bad_wings_v2_miryoku.vil
+        run: python3 -m miryoku_vial --uid "${{ steps.uid.outputs.value }}" -o output/bad_wings_v2_miryoku.vil
 
       - name: Check for changes
         id: diff
@@ -51,7 +57,7 @@ jobs:
         if: github.event_name == 'pull_request' && steps.diff.outputs.changed == 'true'
         run: |
           echo "output/bad_wings_v2_miryoku.vil is out of date with the generator."
-          echo "Run: python3 -m miryoku_vial -o output/bad_wings_v2_miryoku.vil"
+          echo "Run: python3 -m miryoku_vial --uid \"$(cat config/keyboard_uid.txt)\" -o output/bad_wings_v2_miryoku.vil"
           echo "and commit the result."
           git diff -- output/bad_wings_v2_miryoku.vil
           exit 1

@@ -26,24 +26,34 @@ le détail.
 
 ## Installation dans Vial
 
-1. **Important — récupérez d'abord l'`uid` de votre carte** : dans
-   Vial, `File > Download keymap` sur votre Bad Wings V2 tel qu'il
-   est actuellement flashé, et notez le champ `"uid"` du fichier
-   téléchargé. Ce nombre est propre à votre build de firmware ; sans
-   lui, Vial peut refuser de charger un fichier généré ici.
-2. Régénérez le fichier avec ce uid :
-   ```
-   python3 -m miryoku_vial --uid 0xVOTRE_UID -o output/bad_wings_v2_miryoku.vil
-   ```
-3. Dans Vial : `File > Load saved keymap`, sélectionnez le fichier
-   généré.
-4. Réglez le clavier du système d'exploitation sur **"United States -
+Rien à installer ni exécuter en local : tout se fait depuis
+l'interface web de GitHub.
+
+1. **Récupérez l'`uid` de votre carte** : dans Vial, `File > Download
+   keymap` sur votre Bad Wings V2 tel qu'il est actuellement flashé,
+   et notez le champ `"uid"` du fichier téléchargé. Ce nombre est
+   propre à votre build de firmware ; sans lui, Vial peut refuser de
+   charger un fichier généré ici.
+2. Sur GitHub, ouvrez [`config/keyboard_uid.txt`](config/keyboard_uid.txt),
+   cliquez sur l'icône crayon (Edit this file), remplacez `0` par
+   votre uid (décimal ou hex, ex. `0xDEADBEEF`), puis committez
+   directement sur `main`.
+3. Ce commit déclenche automatiquement la
+   [GitHub Action](#régénération-automatique-github-actions), qui
+   régénère `output/bad_wings_v2_miryoku.vil` avec le bon uid et le
+   recommite — quelques secondes plus tard le fichier à jour est
+   disponible dans le dépôt.
+4. Téléchargez ce fichier depuis GitHub, puis dans Vial :
+   `File > Load saved keymap`.
+5. Réglez le clavier du système d'exploitation sur **"United States -
    International"** (voir [docs/keymap.md](docs/keymap.md)) pour
    récupérer les accents français.
 
-## Utilisation du générateur
+## Utilisation du générateur (en local, optionnel)
 
-Aucune dépendance externe (Python ≥ 3.10, stdlib uniquement) :
+Pour développer sur ce dépôt (nouveau layer, nouvelle disposition
+alpha...), le générateur reste utilisable en local. Aucune
+dépendance externe (Python ≥ 3.10, stdlib uniquement) :
 
 ```
 python3 -m miryoku_vial --uid 0x1234ABCD -o output/bad_wings_v2_miryoku.vil
@@ -68,16 +78,19 @@ miryoku_vial/
 tests/              tests de la matrice et de l'export
 docs/keymap.md      diagrammes des layers, doigt par doigt
 output/             fichier .vil généré, prêt à importer
+config/keyboard_uid.txt  uid de votre carte, seul fichier à éditer
 .github/workflows/  régénération automatique (voir ci-dessous)
 ```
 
 ## Régénération automatique (GitHub Actions)
 
 Le workflow `.github/workflows/generate-vil.yml` se déclenche à
-chaque modification de `miryoku_vial/**` ou `pyproject.toml` :
+chaque modification de `miryoku_vial/**`, `pyproject.toml` ou
+`config/keyboard_uid.txt` :
 
 - il lance les tests (`pytest`) ;
-- il régénère `output/bad_wings_v2_miryoku.vil` ;
+- il lit l'uid dans `config/keyboard_uid.txt` et régénère
+  `output/bad_wings_v2_miryoku.vil` avec ;
 - **sur un push**, si le fichier a changé, il le recommite
   automatiquement sur la même branche (commit `github-actions[bot]`,
   message `[skip ci]` pour ne pas relancer le workflow en boucle) ;
@@ -86,9 +99,9 @@ chaque modification de `miryoku_vial/**` ou `pyproject.toml` :
   qu'il faut relancer `python3 -m miryoku_vial` en local et committer
   le résultat avant de merger.
 
-Le fichier régénéré en CI garde `uid=0` (valeur par défaut) : c'est
-un point de départ, à re-régénérer localement avec votre propre
-`--uid` avant import dans Vial (voir plus haut).
+Changer de carte (ou récupérer un nouvel uid après reflash) se fait
+donc entièrement depuis GitHub : éditer
+`config/keyboard_uid.txt`, committer, récupérer le `.vil` régénéré.
 
 **Réglage requis une seule fois** : dans les paramètres du dépôt,
 `Settings > Actions > General > Workflow permissions`, sélectionner
