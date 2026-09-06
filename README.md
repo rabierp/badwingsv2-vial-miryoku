@@ -84,20 +84,17 @@ config/keyboard_uid.txt  uid de votre carte, seul fichier à éditer
 
 ## Régénération automatique (GitHub Actions)
 
-Le workflow `.github/workflows/generate-vil.yml` se déclenche à
-chaque modification de `miryoku_vial/**`, `pyproject.toml` ou
-`config/keyboard_uid.txt` :
+Le projet fonctionne en commits directs sur `main` (pas de pull
+request) : le workflow `.github/workflows/generate-vil.yml` se
+déclenche à chaque push modifiant `miryoku_vial/**`, `pyproject.toml`
+ou `config/keyboard_uid.txt` :
 
 - il lance les tests (`pytest`) ;
 - il lit l'uid dans `config/keyboard_uid.txt` et régénère
   `output/bad_wings_v2_miryoku.vil` avec ;
-- **sur un push**, si le fichier a changé, il le recommite
-  automatiquement sur la même branche (commit `github-actions[bot]`,
-  message `[skip ci]` pour ne pas relancer le workflow en boucle) ;
-- **sur une pull request**, il échoue plutôt si le fichier committé
-  est différent de celui qu'on obtiendrait en régénérant — signe
-  qu'il faut relancer `python3 -m miryoku_vial` en local et committer
-  le résultat avant de merger.
+- si le fichier a changé, il le recommite automatiquement sur la même
+  branche (commit `github-actions[bot]`, message `[skip ci]` pour ne
+  pas relancer le workflow en boucle).
 
 Changer de carte (ou récupérer un nouvel uid après reflash) se fait
 donc entièrement depuis GitHub : éditer

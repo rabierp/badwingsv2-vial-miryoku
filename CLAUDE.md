@@ -8,6 +8,9 @@ Cirque, firmware vial-qmk).
 Ce dépôt est un terrain d'entraînement à Claude Code : privilégier des
 itérations petites et testées plutôt que de grosses réécritures.
 
+Seul contributeur pour l'instant : on travaille en **commits directs
+sur `main`**, pas de pull request systématique.
+
 ## Où sont les choses
 
 - `miryoku_vial/layout.py` — la matrice physique (`KEY_POSITIONS`),
@@ -33,9 +36,10 @@ itérations petites et testées plutôt que de grosses réécritures.
   Toujours garder `pytest` vert après une modification.
 - `.github/workflows/generate-vil.yml` — régénère et recommite
   `output/bad_wings_v2_miryoku.vil` sur push quand `miryoku_vial/**`,
-  `pyproject.toml` ou `config/keyboard_uid.txt` changent ; échoue sur
-  PR si le fichier committé est périmé. C'est le chemin "sans rien
-  installer en local" mis en avant dans le README — le préserver.
+  `pyproject.toml` ou `config/keyboard_uid.txt` changent. C'est le
+  chemin "sans rien installer en local" mis en avant dans le README —
+  le préserver. Pas de déclencheur `pull_request` : on committe
+  directement sur `main`.
 
 ## Invariants à respecter
 
