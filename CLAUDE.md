@@ -9,7 +9,17 @@ Ce dépôt est un terrain d'entraînement à Claude Code : privilégier des
 itérations petites et testées plutôt que de grosses réécritures.
 
 Seul contributeur pour l'instant : on travaille en **commits directs
-sur `main`**, pas de pull request systématique.
+sur `main`**, pas de pull request systématique. Workflow attendu pour
+une modification non triviale :
+
+1. développer et lancer les tests (`pytest`) sur une branche dédiée ;
+2. une fois vert, fusionner/pousser directement sur `main` (fast-forward
+   ou merge, pas de PR GitHub) ;
+3. supprimer la branche (locale **et** distante) une fois fusionnée —
+   ne pas laisser de branches obsolètes traîner sur le dépôt.
+
+Pour un changement trivial (doc, un-liner déjà testé), committer
+directement sur `main` sans passer par une branche est acceptable.
 
 ## Où sont les choses
 
