@@ -1,10 +1,5 @@
 # Contexte projet
 
-Générateur Python (stdlib only) qui produit un fichier `.vil` (format
-Vial) implémentant la disposition Miryoku pour le clavier **Bad Wings
-V2** (36 touches, split, unibody, `LAYOUT_split_3x5_3`, trackpad
-Cirque, firmware vial-qmk).
-
 Ce dépôt est un terrain d'entraînement à Claude Code : privilégier des
 itérations petites et testées plutôt que de grosses réécritures.
 
@@ -29,27 +24,18 @@ directement sur `main` sans passer par une branche est acceptable.
   en amont (dépôt qmk/qmk_firmware) : c'est la source de vérité pour
   le matériel.
 - `miryoku_vial/layers.py` — le contenu de chaque layer, en listes de
-  36 keycodes QMK/Vial (chaînes), dans l'ordre `KEY_POSITIONS`. Chaque
-  layer est commenté par rangée (pinky→inner pour la main gauche,
-  inner→pinky pour la main droite — attention au sens, il change
-  d'une main à l'autre).
+  36 keycodes QMK/Vial (chaînes), dans l'ordre `KEY_POSITIONS`.
 - `miryoku_vial/vial_export.py` — assemble le document `.vil` complet
   (layout + macros/tap-dance/combos vides + réglages).
-- `miryoku_vial/cli.py` — CLI (`python3 -m miryoku_vial`). Ne fige
-  jamais l'uid en dur : `--uid` reste obligatoire pour un vrai import,
-  défaut 0.
+- `miryoku_vial/cli.py` — CLI (`python3 -m miryoku_vial`).
 - `config/keyboard_uid.txt` — seul fichier destiné à être édité
   directement sur GitHub (web UI) par l'utilisateur final : contient
   uniquement l'uid de sa carte (décimal ou `0x...`). Lu par le
   workflow CI, jamais par le code Python lui-même (voir invariants).
 - `tests/` — vérifient la forme de la matrice et du document généré.
   Toujours garder `pytest` vert après une modification.
-- `.github/workflows/generate-vil.yml` — régénère et recommite
-  `output/bad_wings_v2_miryoku.vil` sur push quand `miryoku_vial/**`,
-  `pyproject.toml` ou `config/keyboard_uid.txt` changent. C'est le
-  chemin "sans rien installer en local" mis en avant dans le README —
-  le préserver. Pas de déclencheur `pull_request` : on committe
-  directement sur `main`.
+- `.github/workflows/generate-vil.yml` — le chemin "sans rien
+  installer en local" mis en avant dans le README : le préserver.
 
 ## Invariants à respecter
 
