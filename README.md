@@ -68,7 +68,33 @@ miryoku_vial/
 tests/              tests de la matrice et de l'export
 docs/keymap.md      diagrammes des layers, doigt par doigt
 output/             fichier .vil généré, prêt à importer
+.github/workflows/  régénération automatique (voir ci-dessous)
 ```
+
+## Régénération automatique (GitHub Actions)
+
+Le workflow `.github/workflows/generate-vil.yml` se déclenche à
+chaque modification de `miryoku_vial/**` ou `pyproject.toml` :
+
+- il lance les tests (`pytest`) ;
+- il régénère `output/bad_wings_v2_miryoku.vil` ;
+- **sur un push**, si le fichier a changé, il le recommite
+  automatiquement sur la même branche (commit `github-actions[bot]`,
+  message `[skip ci]` pour ne pas relancer le workflow en boucle) ;
+- **sur une pull request**, il échoue plutôt si le fichier committé
+  est différent de celui qu'on obtiendrait en régénérant — signe
+  qu'il faut relancer `python3 -m miryoku_vial` en local et committer
+  le résultat avant de merger.
+
+Le fichier régénéré en CI garde `uid=0` (valeur par défaut) : c'est
+un point de départ, à re-régénérer localement avec votre propre
+`--uid` avant import dans Vial (voir plus haut).
+
+**Réglage requis une seule fois** : dans les paramètres du dépôt,
+`Settings > Actions > General > Workflow permissions`, sélectionner
+*"Read and write permissions"* — sinon le job ne peut pas pousser le
+commit de régénération (il échouera au `git push`, la partie tests
+reste néanmoins utile).
 
 ## D'où viennent les données
 

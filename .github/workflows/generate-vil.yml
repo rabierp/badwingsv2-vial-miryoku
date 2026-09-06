@@ -1,0 +1,68 @@
+name: Generate Vial keymap
+
+on:
+  push:
+    paths:
+      - "miryoku_vial/**"
+      - "pyproject.toml"
+      - ".github/workflows/generate-vil.yml"
+  pull_request:
+    paths:
+      - "miryoku_vial/**"
+      - "pyproject.toml"
+      - ".github/workflows/generate-vil.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dev dependencies
+        run: pip install pytest
+
+      - name: Run tests
+        run: python3 -m pytest -q
+
+      - name: Regenerate output/bad_wings_v2_miryoku.vil
+        run: python3 -m miryoku_vial -o output/bad_wings_v2_miryoku.vil
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet -- output/bad_wings_v2_miryoku.vil; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # On a pull request we can't safely push back to a possibly
+      # forked branch, so just fail the check and tell the author to
+      # regenerate locally and commit the result.
+      - name: Fail if PR output is stale
+        if: github.event_name == 'pull_request' && steps.diff.outputs.changed == 'true'
+        run: |
+          echo "output/bad_wings_v2_miryoku.vil is out of date with the generator."
+          echo "Run: python3 -m miryoku_vial -o output/bad_wings_v2_miryoku.vil"
+          echo "and commit the result."
+          git diff -- output/bad_wings_v2_miryoku.vil
+          exit 1
+
+      # On a push (to any branch this workflow runs on) we own the
+      # branch, so commit the regenerated file directly.
+      - name: Commit regenerated file
+        if: github.event_name != 'pull_request' && steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output/bad_wings_v2_miryoku.vil
+          git commit -m "Regenerate output/bad_wings_v2_miryoku.vil [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}
